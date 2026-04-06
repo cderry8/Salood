@@ -1,12 +1,40 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import FloatingStack from '../../components/3d/FloatingStack'
 import ServiceCard from '../../components/cards/ServiceCard'
 import TestimonialCard from '../../components/cards/TestimonialCard'
 import GlowButton from '../../components/ui/GlowButton'
 import PageMotion from '../../components/ui/PageMotion'
+import { useAuth } from '../../contexts/AuthContext'
 import { salonGallery, services, team, testimonials } from '../../data/mockData'
 
 function LandingPage() {
+  const { api } = useAuth()
+  const [reviews, setReviews] = useState(testimonials)
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadReviews = async () => {
+      try {
+        const response = await api.get('/reviews')
+        const incomingReviews = response.data?.data?.reviews
+
+        if (isMounted && Array.isArray(incomingReviews) && incomingReviews.length) {
+          setReviews(incomingReviews)
+        }
+      } catch (error) {
+        // Keep static testimonials as fallback when API is unavailable.
+      }
+    }
+
+    loadReviews()
+
+    return () => {
+      isMounted = false
+    }
+  }, [api])
+
   return (
     <PageMotion>
       <section className="grid items-center gap-8 py-8 lg:grid-cols-2">
@@ -76,7 +104,7 @@ function LandingPage() {
       <section className="mt-14">
         <h2 className="mb-5 text-2xl font-semibold text-white">Testimonials</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          {testimonials.map((item) => (
+          {reviews.map((item) => (
             <TestimonialCard key={item.id} item={item} />
           ))}
         </div>

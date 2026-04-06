@@ -1,12 +1,17 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageMotion from '../../components/ui/PageMotion'
+import { useAuth } from '../../contexts/AuthContext'
 import { initialBookings, salonInfo, services } from '../../data/mockData'
 import { formatCurrency } from '../../utils/format'
 
 function UserDashboardPage() {
+  const { api } = useAuth()
   const [bookings, setBookings] = useState(initialBookings)
   const [review, setReview] = useState('')
+  const [rating, setRating] = useState(5)
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
+  const [reviewFeedback, setReviewFeedback] = useState({ type: '', message: '' })
 
   const mapped = useMemo(
     () =>
@@ -22,6 +27,37 @@ function UserDashboardPage() {
 
   const cancelBooking = (id) => {
     setBookings((prev) => prev.map((booking) => (booking.id === id ? { ...booking, status: 'Cancelled' } : booking)))
+  }
+
+  const submitReview = async () => {
+    const cleanReview = review.trim()
+    if (!cleanReview) {
+      setReviewFeedback({ type: 'error', message: 'Please write your review before submitting.' })
+      return
+    }
+
+    setIsSubmittingReview(true)
+    setReviewFeedback({ type: '', message: '' })
+
+    try {
+      const response = await api.post('/reviews', {
+        message: cleanReview,
+        rating
+      })
+
+      if (response.data.success) {
+        setReview('')
+        setRating(5)
+        setReviewFeedback({ type: 'success', message: 'Thanks! Your review has been submitted.' })
+      }
+    } catch (error) {
+      setReviewFeedback({
+        type: 'error',
+        message: error.response?.data?.message || 'Failed to submit review. Please try again.'
+      })
+    } finally {
+      setIsSubmittingReview(false)
+    }
   }
 
   return (
@@ -108,6 +144,23 @@ function UserDashboardPage() {
 
         <section className="rounded-2xl border border-white/15 bg-black/40 p-5">
           <h2 className="text-xl font-semibold text-white">Leave a quick review</h2>
+          <div className="mt-4">
+            <label htmlFor="review-rating" className="text-xs uppercase tracking-wide text-slate-400">
+              Rating
+            </label>
+            <select
+              id="review-rating"
+              value={rating}
+              onChange={(event) => setRating(Number(event.target.value))}
+              className="mt-2 w-full rounded-xl border border-white/15 bg-black/30 p-3 text-sm"
+            >
+              <option value={5}>5 - Excellent</option>
+              <option value={4}>4 - Very good</option>
+              <option value={3}>3 - Good</option>
+              <option value={2}>2 - Fair</option>
+              <option value={1}>1 - Poor</option>
+            </select>
+          </div>
           <textarea
             rows="4"
             value={review}
@@ -115,9 +168,19 @@ function UserDashboardPage() {
             placeholder="How was your last visit?"
             className="mt-4 w-full rounded-xl border border-white/15 bg-black/30 p-3 text-sm"
           />
-          <button type="button" className="mt-3 rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-sm">
-            Submit Review (UI only)
+          <button
+            type="button"
+            onClick={submitReview}
+            disabled={isSubmittingReview}
+            className="mt-3 rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
           </button>
+          {reviewFeedback.message && (
+            <p className={`mt-3 text-sm ${reviewFeedback.type === 'error' ? 'text-red-300' : 'text-emerald-300'}`}>
+              {reviewFeedback.message}
+            </p>
+          )}
         </section>
       </div>
     </PageMotion>

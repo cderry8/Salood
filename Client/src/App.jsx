@@ -33,9 +33,21 @@ function App() {
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:category" element={<CategoryPage />} />
             <Route path="/service/:serviceId" element={<ServiceDetailsPage />} />
-            <Route path="/booking/:serviceId" element={<BookingPage />} />
-            <Route path="/payment" element={<PaymentPage />} />
-            <Route path="/ticket" element={<TicketPage />} />
+            <Route path="/booking/:serviceId" element={
+              <ProtectedRoute>
+                <BookingPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/payment" element={
+              <ProtectedRoute>
+                <PaymentPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/ticket" element={
+              <ProtectedRoute>
+                <TicketPage />
+              </ProtectedRoute>
+            } />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <UserDashboardPage />
