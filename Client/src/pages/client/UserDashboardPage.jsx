@@ -2,11 +2,13 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PageMotion from '../../components/ui/PageMotion'
 import { useAuth } from '../../contexts/AuthContext'
-import { initialBookings, salonInfo, services } from '../../data/mockData'
-import { formatCurrency } from '../../utils/format'
+import { initialBookings, salonInfo } from '../../data/mockData'
+import { useCatalog } from '../../hooks/useCatalog'
+import { formatCurrency, SERVICE_IMAGE_PLACEHOLDER } from '../../utils/format'
 
 function UserDashboardPage() {
   const { api } = useAuth()
+  const { services: catalogServices } = useCatalog()
   const [bookings, setBookings] = useState(initialBookings)
   const [review, setReview] = useState('')
   const [rating, setRating] = useState(5)
@@ -17,9 +19,9 @@ function UserDashboardPage() {
     () =>
       bookings.map((booking) => ({
         ...booking,
-        serviceName: services.find((service) => service.id === booking.serviceId)?.name || 'Service',
+        serviceName: catalogServices.find((service) => service.id === booking.serviceId)?.name || 'Service',
       })),
-    [bookings],
+    [bookings, catalogServices],
   )
 
   const upcoming = mapped.filter((booking) => booking.status === 'Upcoming')
@@ -89,7 +91,10 @@ function UserDashboardPage() {
             {upcoming.map((booking) => (
               <div key={booking.id} className="overflow-hidden rounded-xl border border-white/15 bg-black/30">
                 <img
-                  src={services.find((service) => service.id === booking.serviceId)?.image}
+                  src={
+                    catalogServices.find((service) => service.id === booking.serviceId)?.image ||
+                    SERVICE_IMAGE_PLACEHOLDER
+                  }
                   alt={booking.serviceName}
                   className="h-32 w-full object-cover"
                 />

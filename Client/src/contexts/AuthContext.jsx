@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 // Create context
 const AuthContext = createContext();
@@ -95,7 +96,7 @@ const authReducer = (state, action) => {
 
 // Create axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
   }

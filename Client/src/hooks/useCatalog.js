@@ -3,8 +3,8 @@ import { categories as fallbackCategories, services as fallbackServices } from '
 import { useAuth } from '../contexts/AuthContext'
 
 const normalizeCategory = (item) => ({
-  id: item._id || item.id,
-  slug: item.slug || item.id,
+  id: String(item._id ?? item.id ?? ''),
+  slug: item.slug || String(item._id || item.id || ''),
   name: item.name,
   icon: item.icon || '',
   serviceCount: item.serviceCount ?? 0,
@@ -16,10 +16,12 @@ const normalizeService = (item) => {
     : null
 
   const categorySlug = categoryObj?.slug || item.category
-  const categoryId = categoryObj?._id || item.categoryId || item.category || null
+  const rawCategoryId = categoryObj?._id || item.categoryId || item.category || null
+  const categoryId = rawCategoryId != null ? String(rawCategoryId) : null
 
+  const rawId = item._id ?? item.id
   return {
-    id: item._id || item.id,
+    id: rawId != null ? String(rawId) : '',
     name: item.name,
     description: item.description || '',
     price: Number(item.price) || 0,

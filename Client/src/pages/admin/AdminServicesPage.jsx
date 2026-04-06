@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCatalog } from '../../hooks/useCatalog'
+import { API_BASE_URL } from '../../config/api'
 import { formatCurrency, SERVICE_IMAGE_PLACEHOLDER } from '../../utils/format'
 
 function AdminServicesPage() {
@@ -50,7 +51,7 @@ function AdminServicesPage() {
     const formData = new FormData()
     formData.append('image', file)
     const token = localStorage.getItem('token')
-    const base = (api.defaults.baseURL || 'http://localhost:5000/api').replace(/\/$/, '')
+    const base = (api.defaults.baseURL || API_BASE_URL).replace(/\/$/, '')
     const res = await fetch(`${base}/upload/service-image`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

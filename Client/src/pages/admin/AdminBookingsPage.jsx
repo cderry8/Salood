@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react'
-import { initialBookings, services } from '../../data/mockData'
+import { initialBookings } from '../../data/mockData'
+import { useCatalog } from '../../hooks/useCatalog'
 
 function AdminBookingsPage() {
+  const { services: catalogServices } = useCatalog()
   const [rows, setRows] = useState(initialBookings)
 
   const mapped = useMemo(
     () =>
       rows.map((row) => ({
         ...row,
-        serviceName: services.find((service) => service.id === row.serviceId)?.name || 'Unknown',
+        serviceName: catalogServices.find((service) => service.id === row.serviceId)?.name || 'Unknown',
       })),
-    [rows],
+    [rows, catalogServices],
   )
 
   const updateStatus = (id, status) => {
