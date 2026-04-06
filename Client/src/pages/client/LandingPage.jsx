@@ -6,10 +6,12 @@ import TestimonialCard from '../../components/cards/TestimonialCard'
 import GlowButton from '../../components/ui/GlowButton'
 import PageMotion from '../../components/ui/PageMotion'
 import { useAuth } from '../../contexts/AuthContext'
-import { salonGallery, services, team, testimonials } from '../../data/mockData'
+import { useCatalog } from '../../hooks/useCatalog'
+import { salonGallery, team, testimonials } from '../../data/mockData'
 
 function LandingPage() {
   const { api } = useAuth()
+  const { services } = useCatalog()
   const [reviews, setReviews] = useState(testimonials)
 
   useEffect(() => {

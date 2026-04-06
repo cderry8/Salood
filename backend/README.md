@@ -34,6 +34,17 @@ shyaka randy
 - `GET /api/auth/profile` - Get current user profile (protected)
 - `POST /api/auth/logout` - Logout user
 
+### Catalog
+- `GET /api/categories` - List categories with service counts
+- `POST /api/categories` - Create category (admin)
+- `PUT /api/categories/:id` - Update category (admin)
+- `DELETE /api/categories/:id` - Delete category (admin, only when empty)
+- `GET /api/services` - List services (supports `?category=<slug>`)
+- `GET /api/services/:id` - Get a single service
+- `POST /api/services` - Create service (admin)
+- `PUT /api/services/:id` - Update service (admin)
+- `DELETE /api/services/:id` - Delete service (admin)
+
 ### User Registration Request Body
 ```json
 {

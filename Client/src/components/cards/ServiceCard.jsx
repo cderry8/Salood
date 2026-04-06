@@ -4,14 +4,15 @@ import { formatCurrency } from '../../utils/format'
 
 function ServiceCard({ service }) {
   const MotionArticle = motion.article
+  const categoryLabel = service.categoryName || service.category
 
   return (
     <MotionArticle whileHover={{ y: -6 }} className="overflow-hidden rounded-2xl border border-white/15 bg-black/45">
       <img src={service.image} alt={service.name} className="h-40 w-full object-cover" />
       <div className="p-5">
-        <p className="mb-2 text-xs uppercase tracking-wider text-slate-300">{service.category}</p>
+        <p className="mb-2 text-xs uppercase tracking-wider text-slate-300">{categoryLabel}</p>
         <h3 className="text-lg font-semibold text-white">
-          <span className="mr-2">{service.emoji}</span>
+          {service.emoji ? <span className="mr-2">{service.emoji}</span> : null}
           {service.name}
         </h3>
         <p className="mt-2 text-sm text-slate-300">{service.description}</p>

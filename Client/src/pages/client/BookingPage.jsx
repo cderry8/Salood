@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import PageMotion from '../../components/ui/PageMotion'
-import { services, timeSlots } from '../../data/mockData'
+import { timeSlots } from '../../data/mockData'
 import BookingCalendar from '../../features/booking/BookingCalendar'
 import TimeSlotPicker from '../../features/booking/TimeSlotPicker'
 import { useBookingStore } from '../../hooks/useBookingStore'
+import { useCatalog } from '../../hooks/useCatalog'
 import { formatCurrency } from '../../utils/format'
 
 function BookingPage() {
   const navigate = useNavigate()
   const { serviceId } = useParams()
   const { setBooking } = useBookingStore()
+  const { services } = useCatalog()
   const service = services.find((item) => item.id === serviceId)
   const [date, setDate] = useState('')
   const [slot, setSlot] = useState('')

@@ -1,11 +1,13 @@
 import { Link, useParams } from 'react-router-dom'
 import PageMotion from '../../components/ui/PageMotion'
-import { services } from '../../data/mockData'
 import { formatCurrency } from '../../utils/format'
+import { useCatalog } from '../../hooks/useCatalog'
 
 function ServiceDetailsPage() {
   const { serviceId } = useParams()
+  const { services, categoriesBySlug } = useCatalog()
   const service = services.find((item) => item.id === serviceId)
+  const categoryName = service ? (categoriesBySlug.get(service.category)?.name || service.categoryName || service.category) : ''
 
   if (!service) {
     return <p className="text-slate-300">Service not found.</p>
@@ -16,7 +18,7 @@ function ServiceDetailsPage() {
       <div className="overflow-hidden rounded-2xl border border-white/15 bg-black/40 glow-border">
         <img src={service.image} alt={service.name} className="h-64 w-full object-cover" />
         <div className="p-6">
-        <p className="text-xs uppercase tracking-wider text-cyan-300">{service.category}</p>
+        <p className="text-xs uppercase tracking-wider text-cyan-300">{categoryName}</p>
         <h1 className="mt-2 text-4xl font-bold text-white">{service.name}</h1>
         <p className="mt-4 max-w-2xl text-slate-300">{service.description}</p>
         <p className="mt-2 max-w-2xl text-slate-400">
