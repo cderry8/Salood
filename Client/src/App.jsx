@@ -2,6 +2,8 @@ import { AnimatePresence } from 'framer-motion'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import MainLayout from './components/ui/MainLayout'
 import AdminLayout from './components/ui/AdminLayout'
+import ProtectedRoute from './components/auth/ProtectedRoute'
+import { AuthProvider } from './contexts/AuthContext'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
@@ -23,32 +25,46 @@ function App() {
   const location = useLocation()
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/services/:category" element={<CategoryPage />} />
-          <Route path="/service/:serviceId" element={<ServiceDetailsPage />} />
-          <Route path="/booking/:serviceId" element={<BookingPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/ticket" element={<TicketPage />} />
-          <Route path="/dashboard" element={<UserDashboardPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-        </Route>
+    <AuthProvider>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:category" element={<CategoryPage />} />
+            <Route path="/service/:serviceId" element={<ServiceDetailsPage />} />
+            <Route path="/booking/:serviceId" element={<BookingPage />} />
+            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/ticket" element={<TicketPage />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <UserDashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } />
+          </Route>
 
-        <Route path="/auth/login" element={<LoginPage />} />
-        <Route path="/auth/register" element={<RegisterPage />} />
+          <Route path="/auth/login" element={<LoginPage />} />
+          <Route path="/auth/register" element={<RegisterPage />} />
 
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboardPage />} />
-          <Route path="services" element={<AdminServicesPage />} />
-          <Route path="bookings" element={<AdminBookingsPage />} />
-          <Route path="schedule" element={<AdminSchedulePage />} />
-          <Route path="payments" element={<AdminPaymentsPage />} />
-        </Route>
-      </Routes>
-    </AnimatePresence>
+          <Route path="/admin" element={
+            <ProtectedRoute requireAdmin={true}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<AdminDashboardPage />} />
+            <Route path="services" element={<AdminServicesPage />} />
+            <Route path="bookings" element={<AdminBookingsPage />} />
+            <Route path="schedule" element={<AdminSchedulePage />} />
+            <Route path="payments" element={<AdminPaymentsPage />} />
+          </Route>
+        </Routes>
+      </AnimatePresence>
+    </AuthProvider>
   )
 }
 
