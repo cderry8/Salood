@@ -5,6 +5,7 @@ const connectDB = require('./config/database');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 // Initialize Express app
 const app = express();
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
