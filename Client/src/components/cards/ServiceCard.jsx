@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { formatCurrency } from '../../utils/format'
+import { formatCurrency, SERVICE_IMAGE_PLACEHOLDER } from '../../utils/format'
 
 function ServiceCard({ service }) {
   const MotionArticle = motion.article
@@ -8,7 +8,11 @@ function ServiceCard({ service }) {
 
   return (
     <MotionArticle whileHover={{ y: -6 }} className="overflow-hidden rounded-2xl border border-white/15 bg-black/45">
-      <img src={service.image} alt={service.name} className="h-40 w-full object-cover" />
+      <img
+        src={service.image || SERVICE_IMAGE_PLACEHOLDER}
+        alt={service.name}
+        className="h-40 w-full object-cover"
+      />
       <div className="p-5">
         <p className="mb-2 text-xs uppercase tracking-wider text-slate-300">{categoryLabel}</p>
         <h3 className="text-lg font-semibold text-white">

@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCatalog } from '../../hooks/useCatalog'
-import { formatCurrency } from '../../utils/format'
+import { formatCurrency, SERVICE_IMAGE_PLACEHOLDER } from '../../utils/format'
 
 function AdminServicesPage() {
   const { api } = useAuth()
   const { categories, services, reloadCatalog, error } = useCatalog()
   const [busy, setBusy] = useState(false)
+  const [imageUploading, setImageUploading] = useState(false)
 
   const [categoryForm, setCategoryForm] = useState({ name: '', icon: '' })
   const [editingCategoryId, setEditingCategoryId] = useState('')
@@ -43,6 +44,38 @@ function AdminServicesPage() {
       emoji: '',
     })
     setEditingServiceId('')
+  }
+
+  const uploadServiceImageFile = async (file) => {
+    const formData = new FormData()
+    formData.append('image', file)
+    const token = localStorage.getItem('token')
+    const base = (api.defaults.baseURL || 'http://localhost:5000/api').replace(/\/$/, '')
+    const res = await fetch(`${base}/upload/service-image`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Failed to upload image')
+    }
+    return data.data.url
+  }
+
+  const onServiceImageFile = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setImageUploading(true)
+    try {
+      const url = await uploadServiceImageFile(file)
+      setServiceForm((prev) => ({ ...prev, image: url }))
+    } catch (requestError) {
+      window.alert(requestError?.message || 'Failed to upload image')
+    } finally {
+      setImageUploading(false)
+      event.target.value = ''
+    }
   }
 
   const upsertCategory = async () => {
@@ -238,12 +271,37 @@ function AdminServicesPage() {
               placeholder="Emoji (optional)"
               className="w-full rounded-xl border border-white/20 bg-slate-950/50 p-3 text-sm"
             />
-            <input
-              value={serviceForm.image}
-              onChange={(event) => setServiceForm((prev) => ({ ...prev, image: event.target.value }))}
-              placeholder="Image URL (optional)"
-              className="w-full rounded-xl border border-white/20 bg-slate-950/50 p-3 text-sm"
-            />
+            <div className="grid gap-2">
+              <label className="text-xs text-slate-400">
+                Service image — upload to Cloudinary (admin) or paste a URL
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={onServiceImageFile}
+                disabled={busy || imageUploading}
+                className="w-full text-sm text-slate-200 file:mr-3 file:rounded-lg file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:text-white hover:file:bg-white/15"
+              />
+              {imageUploading ? (
+                <p className="text-xs text-cyan-200/80">Uploading image…</p>
+              ) : null}
+              {serviceForm.image ? (
+                <img
+                  src={serviceForm.image}
+                  alt="Preview"
+                  className="h-28 w-full max-w-xs rounded-lg border border-white/15 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = SERVICE_IMAGE_PLACEHOLDER
+                  }}
+                />
+              ) : null}
+              <input
+                value={serviceForm.image}
+                onChange={(event) => setServiceForm((prev) => ({ ...prev, image: event.target.value }))}
+                placeholder="Image URL (optional if you uploaded above)"
+                className="w-full rounded-xl border border-white/20 bg-slate-950/50 p-3 text-sm"
+              />
+            </div>
             <textarea
               value={serviceForm.description}
               onChange={(event) => setServiceForm((prev) => ({ ...prev, description: event.target.value }))}
@@ -254,7 +312,7 @@ function AdminServicesPage() {
             <button
               type="button"
               onClick={upsertService}
-              disabled={busy || !selectedCategoryInForm}
+              disabled={busy || imageUploading || !selectedCategoryInForm}
               className="rounded-xl bg-cyan-400/20 px-4 py-2 text-sm text-cyan-100 disabled:opacity-60"
             >
               {editingServiceId ? 'Save Service' : 'Create Service'}
@@ -270,10 +328,17 @@ function AdminServicesPage() {
 
       <div className="mt-6 space-y-2">
         {services.map((service) => (
-          <div key={service.id} className="flex items-center justify-between rounded-xl border border-white/15 p-3 text-sm">
-            <div>
-              <p className="font-medium text-white">{service.name}</p>
-              <p className="text-slate-400">{service.categoryName} · {formatCurrency(service.price)} · {service.duration} mins</p>
+          <div key={service.id} className="flex items-center justify-between gap-3 rounded-xl border border-white/15 p-3 text-sm">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <img
+                src={service.image || SERVICE_IMAGE_PLACEHOLDER}
+                alt=""
+                className="h-12 w-12 shrink-0 rounded-lg border border-white/10 object-cover"
+              />
+              <div className="min-w-0">
+                <p className="font-medium text-white">{service.name}</p>
+                <p className="text-slate-400">{service.categoryName} · {formatCurrency(service.price)} · {service.duration} mins</p>
+              </div>
             </div>
             <div className="flex gap-2">
               <button type="button" onClick={() => onEditService(service)} className="rounded-lg bg-white/10 px-3 py-1 text-xs">Edit</button>

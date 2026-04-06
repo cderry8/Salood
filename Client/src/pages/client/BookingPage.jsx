@@ -6,7 +6,7 @@ import BookingCalendar from '../../features/booking/BookingCalendar'
 import TimeSlotPicker from '../../features/booking/TimeSlotPicker'
 import { useBookingStore } from '../../hooks/useBookingStore'
 import { useCatalog } from '../../hooks/useCatalog'
-import { formatCurrency } from '../../utils/format'
+import { formatCurrency, SERVICE_IMAGE_PLACEHOLDER } from '../../utils/format'
 
 function BookingPage() {
   const navigate = useNavigate()
@@ -32,7 +32,11 @@ function BookingPage() {
       <h1 className="text-4xl font-bold text-white">Booking Flow</h1>
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
         <div className="overflow-hidden rounded-2xl border border-white/15 bg-black/40">
-          <img src={service.image} alt={service.name} className="h-48 w-full object-cover" />
+          <img
+            src={service.image || SERVICE_IMAGE_PLACEHOLDER}
+            alt={service.name}
+            className="h-48 w-full object-cover"
+          />
           <div className="p-5">
           <h2 className="text-xl font-semibold text-white">{service.name}</h2>
           <p className="mt-2 text-slate-300">{service.description}</p>

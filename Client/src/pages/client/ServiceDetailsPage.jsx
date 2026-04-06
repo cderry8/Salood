@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import PageMotion from '../../components/ui/PageMotion'
-import { formatCurrency } from '../../utils/format'
+import { formatCurrency, SERVICE_IMAGE_PLACEHOLDER } from '../../utils/format'
 import { useCatalog } from '../../hooks/useCatalog'
 
 function ServiceDetailsPage() {
@@ -16,7 +16,11 @@ function ServiceDetailsPage() {
   return (
     <PageMotion>
       <div className="overflow-hidden rounded-2xl border border-white/15 bg-black/40 glow-border">
-        <img src={service.image} alt={service.name} className="h-64 w-full object-cover" />
+        <img
+          src={service.image || SERVICE_IMAGE_PLACEHOLDER}
+          alt={service.name}
+          className="h-64 w-full object-cover"
+        />
         <div className="p-6">
         <p className="text-xs uppercase tracking-wider text-cyan-300">{categoryName}</p>
         <h1 className="mt-2 text-4xl font-bold text-white">{service.name}</h1>
