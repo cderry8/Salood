@@ -35,6 +35,8 @@ function AdminBookingsPage() {
 
       {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
       {statusError && <p className="mb-4 text-sm text-red-400">{statusError}</p>}
+
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
         <div>
           <label className="text-sm text-slate-300">Filter by Status</label>
           <select
