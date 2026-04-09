@@ -6,10 +6,10 @@ const adminScheduleSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: [true, 'Admin user is required'],
-      unique: true // Each admin has one schedule
+      unique: true 
     },
     schedule: {
-      // Days are 0-6 (0=Sunday, 1=Monday, etc.)
+
       monday: {
         isWorking: { type: Boolean, default: true },
         startTime: { type: String, default: '09:00' }, // HH:MM format
@@ -47,7 +47,7 @@ const adminScheduleSchema = new mongoose.Schema(
       }
     },
     slotDuration: {
-      type: Number, // in minutes
+      type: Number,
       default: 30
     },
     timezone: {
